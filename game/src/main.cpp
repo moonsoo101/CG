@@ -5,6 +5,7 @@
 #include "bar.h"
 #include "brick.h"
 #include "camera.h"
+#include "light.h"
 #include <vector>
 
 extern void ball_init();
@@ -50,6 +51,7 @@ ball_t		ball;
 bar_t		bar(ball.radius);
 trackball	tb;
 std::vector<brick_t> bricks;
+light_t     light;
 
 //*************************************
 void update()
