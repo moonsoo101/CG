@@ -5,7 +5,6 @@
 #include "bar.h"
 #include "brick.h"
 #include "camera.h"
-#include "light.h"
 #include <vector>
 
 extern void ball_init();
@@ -17,7 +16,7 @@ extern void brick_texture_init();
 extern void render_bars();
 //*************************************
 // global constants
-static const char* window_name = "T1 - implementation of game";
+static const char* window_name = "cgbase - texture";
 static const char* vert_shader_path = "../bin/shaders/texture.vert";
 static const char* frag_shader_path = "../bin/shaders/texture.frag";
 static const char* image_path = "../bin/images/bricks.jpg";
@@ -46,13 +45,11 @@ float	pre_t = 0.0f;
 
 //*************************************
 // scene objects
-camera					cam;
-ball_t					ball;
-bar_t					bar(ball.radius);
-trackball				tb;
-std::vector<brick_t>	bricks;
-light_t					light;
-material_t				material;
+camera		cam;
+ball_t		ball;
+bar_t		bar(ball.radius);
+trackball	tb;
+std::vector<brick_t> bricks;
 
 //*************************************
 void update()

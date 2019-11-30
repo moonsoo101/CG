@@ -66,7 +66,6 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="cgmath.h" />
     <ClInclude Include="cgut.h" />
-    <ClInclude Include="light.h" />
     <ClInclude Include="trackball.h" />
   </ItemGroup>
   <ItemGroup>

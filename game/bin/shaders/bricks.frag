@@ -15,6 +15,8 @@ uniform float	shininess;
 
 // texture sampler
 uniform sampler2D TEX;
+uniform bool b_shading;
+uniform bool b_texcoord;
 
 vec4 phong( vec3 l, vec3 n, vec3 h, vec4 Kd )
 {
@@ -36,7 +38,7 @@ void main()
 	vec3 h = normalize(l+v);	// the halfway vector
 
 	vec4 Kd = texture2D( TEX, tc );
-	fragColor = phong( l, n, h, Kd );
-	//fragColor = texture2D( TEX, tc );
+	//fragColor = b_texcoord ? vec4(tc,0,1) : b_shading ? phong( l, n, h, Kd ) : Kd;
+	fragColor = texture2D( TEX, tc );
 	//fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }

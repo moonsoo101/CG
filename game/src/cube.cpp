@@ -5,7 +5,6 @@
 #include "brick.h"
 #include "balls.h"
 #include "bar.h"
-#include "light.h"
 
 //*************************************
 // include stb_image with the implementation preprocessor definition
@@ -19,8 +18,6 @@ extern std::vector<brick_t> bricks;
 extern ivec2 window_size;
 extern ball_t ball;
 extern bar_t bar;
-extern light_t light;
-extern material_t material;
 //*******************************************************************
 GLuint  brick_texture = 0;
 GLuint  program_bricks = 0;
@@ -158,19 +155,6 @@ void render_bricks()
 	glActiveTexture(GL_TEXTURE0);								
 	glBindTexture(GL_TEXTURE_2D, brick_texture);
 	glUniform1i(glGetUniformLocation(program_bricks, "TEX"), 0);	 
-
-	// setup light properties
-	glUniform4fv(glGetUniformLocation(program_bricks, "light_position"), 1, light.position);
-	glUniform4fv(glGetUniformLocation(program_bricks, "Ia"), 1, light.ambient);
-	glUniform4fv(glGetUniformLocation(program_bricks, "Id"), 1, light.diffuse);
-	glUniform4fv(glGetUniformLocation(program_bricks, "Is"), 1, light.specular);
-
-	// setup material properties
-	glUniform4fv(glGetUniformLocation(program_bricks, "Ka"), 1, material.ambient);
-	glUniform4fv(glGetUniformLocation(program_bricks, "Kd"), 1, material.diffuse);
-	glUniform4fv(glGetUniformLocation(program_bricks, "Ks"), 1, material.specular);
-	glUniform1f(glGetUniformLocation(program_bricks, "shininess"), material.shininess);
-
 
 	for (unsigned int i = 0; i < bricks.size(); i++)
 	{
