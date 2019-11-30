@@ -37,10 +37,7 @@ GLuint	vertex_buffer_floor = 0;
 //*************************************
 // global variables
 int		frame = 0;				// index of rendering frames
-bool	b_shading = true;		// apply shading?
-bool	b_texcoord = false;		// show texcoord
 bool	b_wireframe = false;	// this is the default
-
 float	cur_t = 0.0f;
 float	pre_t = 0.0f;
 
@@ -101,11 +98,10 @@ void print_help()
 	printf("[help]\n");
 	printf("- press ESC or 'q' to terminate the program\n");
 	printf("- press F1 or 'h' to see help\n");
-	printf("- press Home to reset camera\n");
-	printf("- press 'w' to toggle wireframe\n");
 	printf("\n");
-	printf("- press 's' to toggle shading\n");
-	printf("- press 't' to toggle between texture and texture coordinates\n");
+	printf("- press 'SPACE_BAR' to make size of the bar twice\n");
+	printf("- Note: After pushing 'SPACE_BAR', size of the bar is going to be bigger.\n");
+	printf("- But it will be smaller than origin size soon. That's penalty of using BIG_BAR.\n");
 	printf("\n");
 }
 
@@ -116,13 +112,20 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mods)
 		if (key == GLFW_KEY_ESCAPE || key == GLFW_KEY_Q)	glfwSetWindowShouldClose(window, GL_TRUE);
 		else if (key == GLFW_KEY_H || key == GLFW_KEY_F1)	print_help();
 		else if (key == GLFW_KEY_HOME)					cam = camera();
-		else if (key == GLFW_KEY_S)					b_shading = !b_shading;
-		else if (key == GLFW_KEY_T)					b_texcoord = !b_texcoord;
 		else if (key == GLFW_KEY_W)
 		{
 			b_wireframe = !b_wireframe;
 			glPolygonMode(GL_FRONT_AND_BACK, b_wireframe ? GL_LINE : GL_FILL);
 			printf("> using %s mode\n", b_wireframe ? "wireframe" : "solid");
+		}
+		else if (key == GLFW_KEY_SPACE)
+		{
+			if (!bar.bar_size_up_state)
+			{
+				bar.bar_size_up_state = !bar.bar_size_up_state;
+				bar.size_up_chance--;
+				bar.size_scale.x *= 2;
+			}
 		}
 	}
 }

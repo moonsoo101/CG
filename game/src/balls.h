@@ -15,8 +15,7 @@ struct ball_t
 	mat4	model_matrix;		// modeling transformation
 
 	// public functions
-	void	update(float t, const bar_t& bar, std::vector<brick_t>& bricks);
-
+	void	update(float t, bar_t& bar, std::vector<brick_t>& bricks);
 	bool	isBallXOut();
 	bool	isBallYOut();
 	bool    isBallZOut();
@@ -103,13 +102,11 @@ inline void	ball_t::checkOverlapWithBricks(std::vector<brick_t>& bricks)
 	}
 }
 
-inline void ball_t::update(float delta_t, const bar_t& bar, std::vector<brick_t>& bricks)
+inline void ball_t::update(float delta_t, bar_t& bar, std::vector<brick_t>& bricks)
 {	
 
 	if (isBallOut())
 	{
-		printf("out\n");
-		
 		if (isBallXOut())
 			vel.x *= -1;
 
@@ -122,8 +119,9 @@ inline void ball_t::update(float delta_t, const bar_t& bar, std::vector<brick_t>
 
 	if (isOverlapWithBar(bar))
 	{
-		printf("overlap\n");
 		vel.y *= -1;
+		if (bar.bar_size_up_state)
+			bar.count++;
 	}
 
 	checkOverlapWithBricks(bricks);
