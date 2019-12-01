@@ -243,7 +243,7 @@ void render_bricks()
 	glUniform4fv(glGetUniformLocation(program_bricks, "Ks"), 1, bricks_material.specular);
 	glUniform1f(glGetUniformLocation(program_bricks, "shininess"), bricks_material.shininess);
 
-	glActiveTexture(GL_TEXTURE1);								
+	glActiveTexture(GL_TEXTURE0);								
 	glBindTexture(GL_TEXTURE_2D, brick_texture);
 	glUniform1i(glGetUniformLocation(program_bricks, "TEX"), 0);	 
 

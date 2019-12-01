@@ -29,7 +29,7 @@ extern bool render_particles(vec3& particle_pos);
 extern void particle_texture_init();
 //*************************************
 // global constants
-static const char* window_name = "cgbase - texture";
+static const char* window_name = "Brick Breaker";
 static const char* vert_shader_path = "../bin/shaders/texture.vert";
 static const char* frag_shader_path = "../bin/shaders/texture.frag";
 static const char* bgm_path = "../bin/bgm.mp3";
@@ -189,6 +189,8 @@ bool user_init()
 	glEnable(GL_CULL_FACE);								// turn on backface culling
 	glEnable(GL_DEPTH_TEST);								// turn on depth tests
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	ball_init();
 
@@ -211,12 +213,12 @@ bool user_init()
 
 	cg_bind_vertex_attributes(program);
 
-	//text_init();
 	cube_init();
 	bricks_init();
 	brick_texture_init();
 	particle_init();
 	particle_texture_init();
+	text_init();
 
 	engine = irrklang::createIrrKlangDevice();
 
@@ -272,11 +274,6 @@ int main(int argc, char* argv[])
 		// clear screen (with background color) and clear depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// render texts
-		/*render_text("Hello text!", 100, 100, 1.0f, vec4(0.5f, 0.8f, 0.2f, 1.0f));
-		render_text("I love Computer Graphics!", 100, 125, 0.5f, vec4(0.7f, 0.4f, 0.1f, 0.8f));
-		render_text("Blinking text here", 100, 155, 0.6f, vec4(0.5f, 0.7f, 0.7f, 0.0f));*/
-
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -331,6 +328,8 @@ int main(int argc, char* argv[])
 		
 		if (!b_game_start)
 		{
+			// render texts
+			render_text("Brick Breaker", 250, 300, 1.5f, vec4(168 / 255.0f, 53 / 255.0f, 44 / 255.0f, 1.0f));
 			glfwSwapBuffers(window);
 			continue;
 		}

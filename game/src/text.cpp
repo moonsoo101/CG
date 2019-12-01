@@ -47,6 +47,8 @@ void create_font_textures()
 
 		// Generate texture
 		GLuint texture_text;
+		glEnable(GL_TEXTURE_2D);
+		glActiveTexture(GL_TEXTURE0);
 		glGenTextures( 1, &texture_text );
 		glBindTexture( GL_TEXTURE_2D, texture_text );
 		glTexImage2D(
@@ -150,6 +152,7 @@ void render_text( std::string text, GLint _x, GLint _y, GLfloat scale, vec4 colo
 	glUseProgram(program_text);
 	glUniform4f(glGetUniformLocation(program_text, "textColor"), color.r, color.g, color.b, color.a);
 	glActiveTexture(GL_TEXTURE0);
+
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	mat4 text_offset = mat4( 1/(window_size.x/2.0f), 0.0f, 0.0f,-1.0f,		// view space conversion
