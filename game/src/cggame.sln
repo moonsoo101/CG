@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29403.142
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "texture", "texture.vcxproj", "{2B9DE619-A7DB-40B0-8C21-21185B606C3B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cggame", "cggame.vcxproj", "{2B9DE619-A7DB-40B0-8C21-21185B606C3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
