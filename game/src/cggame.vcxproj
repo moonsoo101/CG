@@ -9,7 +9,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2B9DE619-A7DB-40B0-8C21-21185B606C3B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>texture</RootNamespace>
+    <RootNamespace>cggame</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
