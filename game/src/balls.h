@@ -35,7 +35,7 @@ inline bool ball_t::isBallXOut()
 inline bool ball_t::isBallYOut()
 {
 	if (center.y - (-1.0f) < radius)
-		out = true
+		out = true;
 	bool y_out = (center.y - (-1.0f) < radius) || (1.0f - center.y < radius) ? true : false;
 	return y_out;
 }
