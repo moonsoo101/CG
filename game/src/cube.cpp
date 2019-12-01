@@ -247,11 +247,6 @@ void render_bricks()
 	glBindTexture(GL_TEXTURE_2D, brick_texture);
 	glUniform1i(glGetUniformLocation(program_bricks, "TEX"), 0);	 
 
-
-	for (unsigned int i = 0; i < bricks.size(); i++)
-		if (bricks[i].bBurst)
-			printf("%d burst\n", i);
-
 	for (unsigned int i = 0; i < bricks.size(); i++)
 	{
 		if (!bricks[i].bShow)

@@ -93,14 +93,14 @@ inline bool ball_t::isOverlapWithBar(const bar_t& bar)
 	return !overlaptest;		
 } 
 
-inline void	ball_t::checkOverlapWithBricks(std::vector<brick_t>& bricks)
+inline void ball_t::checkOverlapWithBricks(std::vector<brick_t>& bricks)
 {
 	for (unsigned int i = 0; i < bricks.size(); i++)
 	{
 		brick_t target_brick = bricks[i];
 		if (!target_brick.bShow)
 			continue;
-		
+
 		float target_brick_x_size = 2.0f * target_brick.x_scale;
 		float target_brick_y_size = 2.0f * target_brick.y_scale;
 		

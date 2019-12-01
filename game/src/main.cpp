@@ -25,7 +25,7 @@ extern void render_bricks();
 extern void brick_texture_init();
 extern void render_bars();
 extern void particle_init();
-extern void render_particles();
+extern bool render_particles(vec3& particle_pos);
 extern void particle_texture_init();
 //*************************************
 // global constants
@@ -62,6 +62,8 @@ float	pre_t = 0.0f;
 bool	b_game_start = false;
 bool	b_game_pause = false;
 bool	b_die = false;
+vec3	burst_pos;
+bool	cur_frame_burst = false;
 
 //*************************************
 // scene objects
@@ -100,14 +102,18 @@ void render()
 
 	render_bricks();
 	render_bars();
-	//render_particles();
+	if (cur_frame_burst)
+	{
+		printf("Burst");
+		if(!render_particles(burst_pos))
+			cur_frame_burst = false;
+	}
 	
 	if (ball.bColl)
 	{
 		engine->play2D(effect);
 		ball.bColl = false;
 	}
-	//render_particle();
 }
 
 void reshape(GLFWwindow* window, int width, int height)
@@ -355,6 +361,15 @@ int main(int argc, char* argv[])
 			}
 
 			ball.update(diff_t, bar, bricks);
+			for (unsigned int i = 0; i < bricks.size(); i++)
+			{
+				if (bricks[i].bShow == false && bricks[i].bBurst == true)
+				{
+					cur_frame_burst = true;
+					burst_pos = vec3(bricks[i].pos, 0);
+					bricks[i].bBurst = false;
+				}
+			}
 			bar.update(diff_t);
 			pre_t = cur_t;
 
