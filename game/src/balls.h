@@ -13,6 +13,7 @@ struct ball_t
 	vec4	color = vec4(0, 0, 1.0f, 1.0f);				// RGBA color in [0,1]
 	vec3	vel = vec3(0.8f, 0.8f, 1.2f);
 	mat4	model_matrix;		// modeling transformation
+	bool	bColl = false;
 
 	// public functions
 	void	update(float t, bar_t& bar, std::vector<brick_t>& bricks);
@@ -98,6 +99,7 @@ inline void	ball_t::checkOverlapWithBricks(std::vector<brick_t>& bricks)
 		{
 			bricks[i].bShow = false;
 			vel.y *= -1;
+			this->bColl = true;
 		}
 	}
 }

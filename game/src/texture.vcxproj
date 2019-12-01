@@ -49,15 +49,20 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>GL\glfw\;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>GL\glfw\;C:\Users\정문수\Desktop\git\CG\game\src\irrKlang</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="balls.cpp" />
     <ClCompile Include="cube.cpp" />
+    <ClCompile Include="dear_imgui\imgui.cpp" />
+    <ClCompile Include="dear_imgui\imgui_demo.cpp" />
+    <ClCompile Include="dear_imgui\imgui_draw.cpp" />
+    <ClCompile Include="dear_imgui\imgui_impl_glfw_gl3.cpp" />
     <ClCompile Include="GL\glad\glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="particle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="balls.h" />
@@ -66,8 +71,11 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="cgmath.h" />
     <ClInclude Include="cgut.h" />
+    <ClInclude Include="imconfig.h" />
+    <ClInclude Include="imgui.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="material.h" />
+    <ClInclude Include="particle.h" />
     <ClInclude Include="trackball.h" />
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +85,8 @@
     <None Include="..\bin\shaders\bars.vert" />
     <None Include="..\bin\shaders\bricks.frag" />
     <None Include="..\bin\shaders\bricks.vert" />
+    <None Include="..\bin\shaders\particle.frag" />
+    <None Include="..\bin\shaders\particle.vert" />
     <None Include="..\bin\shaders\texture.frag" />
     <None Include="..\bin\shaders\texture.vert" />
   </ItemGroup>

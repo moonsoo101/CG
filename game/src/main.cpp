@@ -6,7 +6,13 @@
 #include "brick.h"
 #include "camera.h"
 #include "light.h"
+#include "particle.h"
 #include <vector>
+#include "dear_imgui/imgui.h"
+#include "dear_imgui/imgui_impl_glfw_gl3.h"
+#include "irrKlang/irrKlang.h"
+#pragma comment(lib, "irrKlang.lib")
+
 
 extern void ball_init();
 extern void render_balls();
@@ -15,12 +21,17 @@ extern void bricks_init();
 extern void render_bricks();
 extern void brick_texture_init();
 extern void render_bars();
+extern void particle_init();
+extern void particle_update();
+extern void render_particle();
 //*************************************
 // global constants
 static const char* window_name = "cgbase - texture";
 static const char* vert_shader_path = "../bin/shaders/texture.vert";
 static const char* frag_shader_path = "../bin/shaders/texture.frag";
 static const char* image_path = "../bin/images/bricks.jpg";
+static const char* bgm_path = "../bin/bgm.mp3";
+static const char* effect_path = "../bin/brick.mp3";
 
 //*************************************
 // window objects
@@ -34,6 +45,12 @@ GLuint	program_floor = 0;
 
 GLuint	floorVAO = 0;
 GLuint	vertex_buffer_floor = 0;
+
+//*******************************************************************
+// irrKlang objects
+irrklang::ISoundEngine* engine;
+irrklang::ISoundSource* bgm;
+irrklang::ISoundSource* effect;
 //*************************************
 // global variables
 int		frame = 0;				// index of rendering frames
@@ -56,6 +73,7 @@ void update()
 	// update projection matrix
 	cam.aspect_ratio = window_size.x / float(window_size.y);
 	cam.projection_matrix = mat4::perspective(cam.fovy, cam.aspect_ratio, cam.dNear, cam.dFar);
+	//particle_update();
 
 	// update uniform variables in vertex/fragment shaders
 	GLint uloc;
@@ -79,6 +97,13 @@ void render()
 
 	render_bricks();
 	render_bars();
+
+	if (ball.bColl)
+	{
+		engine->play2D(effect);
+		ball.bColl = false;
+	}
+	//render_particle();
 
 	// swap front and back buffers, and display to screen
 	glfwSwapBuffers(window);
@@ -184,17 +209,33 @@ bool user_init()
 	cube_init();
 	bricks_init();
 	brick_texture_init();
+	//particle_init();
+
+	engine = irrklang::createIrrKlangDevice();
+
+	if (!engine) return false;
+
+	bgm = engine->addSoundSourceFromFile(bgm_path);
+	effect = engine->addSoundSourceFromFile(effect_path);
+
+	//set default volume;
+	bgm->setDefaultVolume(0.2f);
+	effect->setDefaultVolume(0.2f);
+
+	//play the sound file
+	engine->play2D(bgm, true);
 
 	return true;
 }
 
 void user_finalize()
 {
+	// close the engine
+	engine->drop();
 }
 
 int main(int argc, char* argv[])
 {
-	// initialization
 	if (!glfwInit()) { printf("[error] failed in glfwInit()\n"); return 1; }
 
 	// create window and initialize OpenGL extensions
@@ -211,10 +252,35 @@ int main(int argc, char* argv[])
 	glfwSetMouseButtonCallback(window, mouse);	// callback for mouse click inputs
 	glfwSetCursorPosCallback(window, motion);		// callback for mouse movement
 
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui_ImplGlfwGL3_Init(window, true);
+	ImGui::StyleColorsLight();
+
 	// enters rendering/event loop
 	for (frame = 0; !glfwWindowShouldClose(window); frame++)
 	{
 		glfwPollEvents();	// polling and processing of events
+
+		ImGui_ImplGlfwGL3_NewFrame();
+		ImGui::NewFrame();
+
+		static float f = 0.0f;
+		static int counter = 0;
+
+		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+
+		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			counter++;
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
 
 		if (frame == 0)
 		{
@@ -238,11 +304,19 @@ int main(int argc, char* argv[])
 		ball.update(diff_t, bar, bricks);
 		bar.update(diff_t);
 		pre_t = cur_t;
+		ImGui::Render();
+		int display_w, display_h;
+		glfwGetFramebufferSize(window, &display_w, &display_h);
+		ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
 		update();			// per-frame update
 		render();			// per-frame render
+
+
 	}
 
+	ImGui_ImplGlfwGL3_Shutdown();
+	ImGui::DestroyContext();
 	// normal termination
 	user_finalize();
 	cg_destroy_window(window);
