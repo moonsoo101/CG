@@ -14,53 +14,44 @@ struct particle_t
 	float scale;
 	float life;
 	mat4 model_matrix;
-
-	//optional
-	float elapsed_time;
-	float time_interval;
+	bool bDead=false;
 
 	particle_t() { reset(); }
-
 	void reset()
 	{
-		pos = vec3(random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f));
+		pos = vec3(0, 0, 0);
 		color = vec4(random_range(0, 1.0f), random_range(0, 1.0f), random_range(0, 1.0f), 1);
 		scale = random_range(0.003f, 0.004f);
-	
+
 		life = random_range(0.01f, 1.0f);
-		velocity = vec3(random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f)) * 0.003f;
-		elapsed_time = 0.0f;
-		time_interval = random_range(200.0f, 600.0f);
+		velocity = vec3(random_range(-1.0f, 1.0f), random_range(-1.0f, 0.0f), random_range(-1.0f, 1.0f)) * 0.003f;
 	}
 
+	// dead -> return true;
 	void update()
 	{
 		const float dwTime = (float)glfwGetTime();
-		elapsed_time += dwTime;
-
-		if (elapsed_time > time_interval)
-		{
-			const float theta = random_range(0, 1.0f) * PI * 2.0f;
-			constexpr float velocity_factor = 0.003f;
-			velocity = vec3(cos(theta), sin(theta), cos(theta)) * velocity_factor;
-
-			elapsed_time = 0.0f;
-		}
-
+		
 		pos += velocity;
 
-		constexpr float life_factor = 0.001f;
+		//constexpr float life_factor = 0.001f;
+		constexpr float life_factor = 1.0f;
 		life -= life_factor * dwTime;
 
 		// disappear
 		if (life < 0.0f)
 		{
-			constexpr float alpha_factor = 0.001f;
+			constexpr float alpha_factor = 0.002f;
 			color.a -= alpha_factor * dwTime;
 		}
 
 		// dead
-		if (color.a < 0.0f) reset();
+		if (color.a < 0.0f) 
+		{
+			reset();
+			bDead = true;
+		}
+			
 
 		mat4 scale_matrix =
 		{

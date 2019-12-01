@@ -7,7 +7,7 @@
 struct camera
 {
 	vec3	eye = vec3(0, 0.1f, 3.6f);
-//	vec3	eye = vec3(0, 0, 3.6f);
+//	vec3	eye = vec3(0, 0, 5.0f);
 	vec3	at = vec3(0, 0, 0);
 	vec3	up = vec3(0, 1, 0);
 	mat4	view_matrix = mat4::look_at(eye, at, up);
