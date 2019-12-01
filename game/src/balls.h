@@ -34,6 +34,8 @@ inline bool ball_t::isBallXOut()
 
 inline bool ball_t::isBallYOut()
 {
+	if (center.y - (-1.0f) < radius)
+		out = true
 	bool y_out = (center.y - (-1.0f) < radius) || (1.0f - center.y < radius) ? true : false;
 	return y_out;
 }
@@ -114,7 +116,7 @@ inline void ball_t::update(float delta_t, bar_t& bar, std::vector<brick_t>& bric
 			vel.x *= -1;
 
 		if (isBallYOut())
-			out = true;
+			vel.y *= -1;
 
 		if (isBallZOut())
 			vel.z *= -1;
