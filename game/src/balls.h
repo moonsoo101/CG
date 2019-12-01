@@ -4,6 +4,7 @@
 #include "cgmath.h"
 #include "bar.h"
 #include "brick.h"
+#include "myrandom.h"
 #include <stdio.h>
 
 struct ball_t
@@ -11,12 +12,17 @@ struct ball_t
 	float	radius = 0.02f;		// radius
 	vec3	center = vec3(0, -0.5f, 0);		// 2D position for translation
 	vec4	color = vec4(0, 0, 1.0f, 1.0f);				// RGBA color in [0,1]
-	vec3	vel = vec3(0.8f, 0.8f, 1.2f);
 	mat4	model_matrix;		// modeling transformation
+	
+	float	init_ang;
+	float	init_sp;
+	vec3	vel; 
+
 	bool	bColl = false;
 	bool	out = false;
 
 	// public functions
+	ball_t();
 	void	update(float t, bar_t& bar, std::vector<brick_t>& bricks);
 	bool	isBallXOut();
 	bool	isBallYOut();
@@ -25,6 +31,17 @@ struct ball_t
 	bool	isOverlapWithBar(const bar_t& bar);
 	void	checkOverlapWithBricks(std::vector<brick_t>& bricks);
 };
+
+inline ball_t::ball_t()
+{
+	init_sp = random_range(1.0f, 2.5f);
+	do {
+		init_ang = random_range(PI / 8, 7 * PI / 8);
+	} while (abs(init_ang - PI/2)<0.35f);
+	vel.x = init_sp * cosf(init_ang);
+	vel.y = init_sp * sinf(init_ang);
+	vel.z = 0.0f;
+}
 
 inline bool ball_t::isBallXOut()
 {

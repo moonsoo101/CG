@@ -7,14 +7,13 @@
 #include "bar.h"
 #include "light.h"
 #include "material.h"
-
+#include "myrandom.h"
 //*************************************
 // include stb_image with the implementation preprocessor definition
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 //*******************************************************************
-inline const float random_range(float min, float max) { return min + rand() / (RAND_MAX / (max - min)); }
 extern struct camera cam;
 extern std::vector<brick_t> bricks;
 extern ivec2 window_size;

@@ -3,11 +3,7 @@
 #define __PARTICLE_H__
 #include "cgmath.h"			// slee's simple math library
 #include "cgut.h"			// slee's OpenGL utility
-
-//*************************************
-//Random Func
-inline const float random_range(float min, float max) { return min + rand() / (RAND_MAX / (max - min)); }
-
+#include "myrandom.h"
 //*************************************
 // common structures
 struct particle_t

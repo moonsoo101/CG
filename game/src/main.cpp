@@ -90,7 +90,6 @@ void update()
 void render()
 {
 
-	// notify GL that we use our own program and buffers
 	render_balls();
 
 	glUseProgram(program);
@@ -108,8 +107,6 @@ void render()
 		ball.bColl = false;
 	}
 	//render_particle();
-
-
 }
 
 void reshape(GLFWwindow* window, int width, int height)
