@@ -14,6 +14,9 @@
 #include "stb_image.h"
 
 //*******************************************************************
+
+#define max_particle 500
+
 extern struct camera cam;
 extern std::vector<brick_t> bricks;
 extern std::vector<particle_t> particles;
@@ -52,8 +55,6 @@ void particle_init()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	// initialize particles
-	constexpr int max_particle = 500;
 	particles.resize(max_particle);
 }
 
@@ -88,8 +89,9 @@ void particle_texture_init()
 
 }
 
-void render_particles(vec3& particle_pos)
+bool render_particles(vec3& particle_pos)
 {
+	
 	glUseProgram(program_particles);
 	glBindVertexArray(particleVAO);
 
@@ -117,12 +119,18 @@ void render_particles(vec3& particle_pos)
 	for (auto& p : particles)
 	{
 		if (p.bDead)
+		{
+			particles.resize(max_particle);
+			p.bDead = false;
 			break;
-
+			return false;
+		}
+			
 		uloc = glGetUniformLocation(program_particles, "color");				if (uloc > -1) glUniform4fv(uloc, 1, p.color);
 		uloc = glGetUniformLocation(program_particles, "model_matrix");			if (uloc > -1) glUniformMatrix4fv(uloc, 1, GL_TRUE, instancing_matrix * p.model_matrix);
 
 		// render quad vertices
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
+	return true;
 }

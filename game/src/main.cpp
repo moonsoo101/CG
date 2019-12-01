@@ -25,7 +25,7 @@ extern void render_bricks();
 extern void brick_texture_init();
 extern void render_bars();
 extern void particle_init();
-extern void render_particles(vec3& particle_pos);
+extern bool render_particles(vec3& particle_pos);
 extern void particle_texture_init();
 //*************************************
 // global constants
@@ -104,9 +104,11 @@ void render()
 	render_bars();
 	if (cur_frame_burst)
 	{
-		render_particles(burst_pos);
-		cur_frame_burst = false;
+		printf("Burst");
+		if(!render_particles(burst_pos))
+			cur_frame_burst = false;
 	}
+	
 	if (ball.bColl)
 	{
 		engine->play2D(effect);
@@ -361,10 +363,10 @@ int main(int argc, char* argv[])
 			ball.update(diff_t, bar, bricks);
 			for (unsigned int i = 0; i < bricks.size(); i++)
 			{
-				if (!bricks[i].bShow && bricks[i].bBurst)
+				if (bricks[i].bShow == false && bricks[i].bBurst == true)
 				{
 					cur_frame_burst = true;
-					burst_pos = vec3(bricks[i].pos, 1);
+					burst_pos = vec3(bricks[i].pos, 0);
 					bricks[i].bBurst = false;
 				}
 			}
