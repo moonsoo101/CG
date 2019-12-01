@@ -25,7 +25,8 @@ struct particle_t
 	{
 		pos = vec3(random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f));
 		color = vec4(random_range(0, 1.0f), random_range(0, 1.0f), random_range(0, 1.0f), 1);
-		scale = random_range(0.0001f, 0.02f);
+		scale = random_range(0.003f, 0.004f);
+	
 		life = random_range(0.01f, 1.0f);
 		velocity = vec3(random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f)) * 0.003f;
 		elapsed_time = 0.0f;

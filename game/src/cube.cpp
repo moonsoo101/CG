@@ -8,6 +8,9 @@
 #include "light.h"
 #include "material.h"
 #include "myrandom.h"
+
+#define RANDOM_BURST_NUM 10
+
 //*************************************
 // include stb_image with the implementation preprocessor definition
 #define STB_IMAGE_IMPLEMENTATION
@@ -35,6 +38,21 @@ static const char* bricks_image_path = "../bin/images/bricks.jpg";
 //*******************************************************************
 material_t bricks_material;
 //*******************************************************************
+
+int compare(const void* a, const void* b)   
+{
+	int n1 = *(int*)a;    
+	int n2 = *(int*)b;   
+
+	if (n1 > n2)    
+		return -1;      
+
+	if (n1 < n2)    
+		return 1;       
+
+	return 0;   
+}
+
 void cube_init()
 {
 	if (!(program_bricks = cg_create_program(vert_bricks_path, frag_bricks_path))) { glfwTerminate(); return; }
@@ -129,8 +147,13 @@ void bricks_init()
 	constexpr int y_unit = 10;
 	int x_unit[y_unit] = { 0, };
 
+	std::vector<int> target_IDs;
+	for (int i = 0; i < RANDOM_BURST_NUM; i++)
+		target_IDs.push_back(int(random_range(0, 60)));
+	
 	for (int i = 0; i < sizeof(x_unit) / sizeof(int); i++)
 		x_unit[i] = int(random_range(6, 20));
+
 
 	for (int j = 0; j < y_unit; j++)
 	{
@@ -143,9 +166,10 @@ void bricks_init()
 			float x_scale = 1.0f / x_unit[j];
 			float x_unit_size = 2.0f * x_scale;
 			float x_offset = i * x_unit_size + (x_unit_size / 2);
-
+			
 			brick_t tmp_brick = {
 				true,
+				false,
 				x_scale, y_scale,
 				x_offset, y_offset,
 				vec2(-1 + x_offset, 1 - y_offset)
@@ -153,6 +177,14 @@ void bricks_init()
 
 			bricks.push_back(tmp_brick);
 		}
+	}
+
+	while (!target_IDs.empty())
+	{
+		int target = target_IDs.back();
+		bricks[target].bBurst = true;
+		bricks[target].burst_random_color = vec3(random_range(0.0f, 1.0f), random_range(0.0f, 1.0f), random_range(0.0f, 1.0f));
+		target_IDs.pop_back();
 	}
 
 	bar.pos = vec3(0, -0.8f, 0);
@@ -168,7 +200,8 @@ void brick_texture_init()
 	for (int y = 0; y < height; y++) memcpy(pimage + (height - 1 - y) * stride1, pimage0 + y * stride0, stride0); // vertical flip
 
 	// create textures
-	glActiveTexture(GL_TEXTURE1);
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &brick_texture);
 	glBindTexture(GL_TEXTURE_2D, brick_texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8 /* GL_RGB for legacy GL */, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pimage);
@@ -212,7 +245,12 @@ void render_bricks()
 
 	glActiveTexture(GL_TEXTURE1);								
 	glBindTexture(GL_TEXTURE_2D, brick_texture);
-	glUniform1i(glGetUniformLocation(program_bricks, "TEX"), 1);	 
+	glUniform1i(glGetUniformLocation(program_bricks, "TEX"), 0);	 
+
+
+	for (unsigned int i = 0; i < bricks.size(); i++)
+		if (bricks[i].bBurst)
+			printf("%d burst\n", i);
 
 	for (unsigned int i = 0; i < bricks.size(); i++)
 	{
@@ -224,6 +262,12 @@ void render_bricks()
 		float y_scale = bricks[i].y_scale;
 		mat4 model_matrix = mat4::translate(vec3(x_pos, y_pos, 0)) * mat4::scale(vec3(x_scale, y_scale, 8 * ball.radius));
 		glUniformMatrix4fv(glGetUniformLocation(program_bricks, "model_matrix"), 1, GL_TRUE, model_matrix);
+		glUniform1i(glGetUniformLocation(program_bricks, "b_burst"), false);
+		if (bricks[i].bBurst)
+		{
+			glUniform3fv(glGetUniformLocation(program_bricks, "color"), 1, bricks[i].burst_random_color);
+			glUniform1i(glGetUniformLocation(program_bricks, "b_burst"), bricks[i].bBurst);
+		}
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 }

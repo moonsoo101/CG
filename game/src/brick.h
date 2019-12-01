@@ -7,9 +7,11 @@
 struct brick_t
 {
 	bool bShow;
+	bool bBurst;
 	float x_scale, y_scale;
 	float x_offset, y_offset;
 	vec2 pos;
+	vec3 burst_random_color;
 };
 
 #endif

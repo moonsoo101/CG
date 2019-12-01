@@ -34,8 +34,6 @@ static const char* frag_particle_path = "../bin/shaders/particle.frag";
 static const char* particle_image_path = "../bin/images/Snowflake.png";
 
 //*******************************************************************
-
-//*******************************************************************
 void particle_init()
 {
 	if (!(program_particles = cg_create_program(vert_particle_path, frag_particle_path))) { glfwTerminate(); return; }
@@ -70,7 +68,8 @@ void particle_texture_init()
 	stbi_image_free(pimage0); // release the original image
 
 	// create textures
-	glActiveTexture(GL_TEXTURE0);
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE2);
 	glGenTextures(1, &particle_texture);
 	glBindTexture(GL_TEXTURE_2D, particle_texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8 /* GL_RGB for legacy GL */, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pimage_particle);
@@ -103,9 +102,9 @@ void render_particles()
 	for (auto& p : particles) p.update();
 
 	// setup texture
-	glActiveTexture(GL_TEXTURE0);								// select the texture slot to bind
+	glActiveTexture(GL_TEXTURE2);								// select the texture slot to bind
 	glBindTexture(GL_TEXTURE_2D, particle_texture);
-	glUniform1i(glGetUniformLocation(program_particles, "TEX"), 0);	 // GL_TEXTURE0
+	glUniform1i(glGetUniformLocation(program_particles, "TEX"), 2);	 // GL_TEXTURE0
 
 	for (auto& p : particles)
 	{

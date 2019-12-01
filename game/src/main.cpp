@@ -32,7 +32,6 @@ extern void particle_texture_init();
 static const char* window_name = "cgbase - texture";
 static const char* vert_shader_path = "../bin/shaders/texture.vert";
 static const char* frag_shader_path = "../bin/shaders/texture.frag";
-//static const char* image_path = "../bin/images/bricks.jpg";
 static const char* bgm_path = "../bin/bgm.mp3";
 static const char* effect_path = "../bin/brick.mp3";
 
@@ -101,7 +100,8 @@ void render()
 
 	render_bricks();
 	render_bars();
-	render_particles();
+	//render_particles();
+	
 	if (ball.bColl)
 	{
 		engine->play2D(effect);

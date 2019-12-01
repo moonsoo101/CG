@@ -13,4 +13,5 @@ uniform vec4 color;
 void main()
 {
 	fragColor = texture2D( TEX, tc ) * color;
+//	fragColor = texture2D( TEX, tc );
 }
