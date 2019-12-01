@@ -25,14 +25,14 @@ extern void render_bricks();
 extern void brick_texture_init();
 extern void render_bars();
 extern void particle_init();
-extern void particle_update();
-extern void render_particle();
+extern void render_particles();
+extern void particle_texture_init();
 //*************************************
 // global constants
 static const char* window_name = "cgbase - texture";
 static const char* vert_shader_path = "../bin/shaders/texture.vert";
 static const char* frag_shader_path = "../bin/shaders/texture.frag";
-static const char* image_path = "../bin/images/bricks.jpg";
+//static const char* image_path = "../bin/images/bricks.jpg";
 static const char* bgm_path = "../bin/bgm.mp3";
 static const char* effect_path = "../bin/brick.mp3";
 
@@ -66,12 +66,13 @@ bool	b_die = false;
 
 //*************************************
 // scene objects
-camera		cam;
-ball_t		ball;
-bar_t		bar(ball.radius);
-trackball	tb;
-std::vector<brick_t> bricks;
-light_t     light;
+camera					cam;
+ball_t					ball;
+bar_t					bar(ball.radius);
+trackball				tb;
+std::vector<brick_t>	bricks;
+std::vector<particle_t> particles;
+light_t					light;
 
 //*************************************
 void update()
@@ -100,7 +101,7 @@ void render()
 
 	render_bricks();
 	render_bars();
-
+	render_particles();
 	if (ball.bColl)
 	{
 		engine->play2D(effect);
@@ -182,7 +183,6 @@ bool user_init()
 	glEnable(GL_CULL_FACE);								// turn on backface culling
 	glEnable(GL_DEPTH_TEST);								// turn on depth tests
 	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE0);
 	
 	ball_init();
 
@@ -209,7 +209,8 @@ bool user_init()
 	cube_init();
 	bricks_init();
 	brick_texture_init();
-	//particle_init();
+	particle_init();
+	particle_texture_init();
 
 	engine = irrklang::createIrrKlangDevice();
 

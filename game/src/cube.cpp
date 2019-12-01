@@ -168,6 +168,7 @@ void brick_texture_init()
 	for (int y = 0; y < height; y++) memcpy(pimage + (height - 1 - y) * stride1, pimage0 + y * stride0, stride0); // vertical flip
 
 	// create textures
+	glActiveTexture(GL_TEXTURE1);
 	glGenTextures(1, &brick_texture);
 	glBindTexture(GL_TEXTURE_2D, brick_texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8 /* GL_RGB for legacy GL */, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pimage);
@@ -209,9 +210,9 @@ void render_bricks()
 	glUniform4fv(glGetUniformLocation(program_bricks, "Ks"), 1, bricks_material.specular);
 	glUniform1f(glGetUniformLocation(program_bricks, "shininess"), bricks_material.shininess);
 
-	glActiveTexture(GL_TEXTURE0);								
+	glActiveTexture(GL_TEXTURE1);								
 	glBindTexture(GL_TEXTURE_2D, brick_texture);
-	glUniform1i(glGetUniformLocation(program_bricks, "TEX"), 0);	 
+	glUniform1i(glGetUniformLocation(program_bricks, "TEX"), 1);	 
 
 	for (unsigned int i = 0; i < bricks.size(); i++)
 	{

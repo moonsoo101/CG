@@ -1,22 +1,24 @@
 #version 330
 
-// vertex attributes
 in vec3 position;
 in vec3 normal;
 in vec2 texcoord;
 
-out vec2 tc;	// texture coordinate
+out vec2 tc;
 
-// uniforms
-uniform vec2 center;
-uniform float scale;
-uniform float aspect_ratio;
+uniform vec3 up;
+uniform vec3 right;
+
+uniform mat4 model_matrix;
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
 
 void main()
 {
-	vec3 pos = position * scale;
-	pos.xy *= aspect_ratio>1 ? vec2(1/aspect_ratio,1) : vec2(1,aspect_ratio); // tricky aspect correction
-
-	gl_Position = vec4(center, 0, 0) +  vec4(pos, 1);
+	vec3 p = right * position.x + up * position.y;
+	vec4 wpos = model_matrix * vec4(p, 1);
+	vec4 epos = view_matrix * wpos;
+	
+	gl_Position = projection_matrix * epos;
 	tc = texcoord;
 }

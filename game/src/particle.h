@@ -4,15 +4,16 @@
 #include "cgmath.h"			// slee's simple math library
 #include "cgut.h"			// slee's OpenGL utility
 #include "myrandom.h"
+
 //*************************************
-// common structures
 struct particle_t
 {
-	vec2 pos;
+	vec3 pos;
 	vec4 color;
-	vec2 velocity;
+	vec3 velocity;
 	float scale;
 	float life;
+	mat4 model_matrix;
 
 	//optional
 	float elapsed_time;
@@ -22,11 +23,11 @@ struct particle_t
 
 	void reset()
 	{
-		pos = vec2(random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f));
+		pos = vec3(random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f));
 		color = vec4(random_range(0, 1.0f), random_range(0, 1.0f), random_range(0, 1.0f), 1);
 		scale = random_range(0.0001f, 0.02f);
 		life = random_range(0.01f, 1.0f);
-		velocity = vec2(random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f)) * 0.003f;
+		velocity = vec3(random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f), random_range(-1.0f, 1.0f)) * 0.003f;
 		elapsed_time = 0.0f;
 		time_interval = random_range(200.0f, 600.0f);
 	}
@@ -40,7 +41,7 @@ struct particle_t
 		{
 			const float theta = random_range(0, 1.0f) * PI * 2.0f;
 			constexpr float velocity_factor = 0.003f;
-			velocity = vec2(cos(theta), sin(theta)) * velocity_factor;
+			velocity = vec3(cos(theta), sin(theta), cos(theta)) * velocity_factor;
 
 			elapsed_time = 0.0f;
 		}
@@ -59,8 +60,23 @@ struct particle_t
 
 		// dead
 		if (color.a < 0.0f) reset();
+
+		mat4 scale_matrix =
+		{
+			scale, 0, 0, 0,
+			0, scale, 0, 0,
+			0, 0, scale, 0,
+			0, 0, 0, 1
+		};
+
+		mat4 translate_matrix =
+		{
+			1, 0, 0, pos.x,
+			0, 1, 0, pos.y,
+			0, 0, 1, pos.z,			//center.z,
+			0, 0, 0, 1
+		};
+		model_matrix = translate_matrix * scale_matrix;
 	}
 };
-
-
 #endif
