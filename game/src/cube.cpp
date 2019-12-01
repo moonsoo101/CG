@@ -121,7 +121,7 @@ void cube_init()
 	cg_bind_vertex_attributes(program_bars);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);;
+	glBindVertexArray(0);
 }
 
 void bricks_init()

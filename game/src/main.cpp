@@ -9,10 +9,10 @@
 #include "particle.h"
 #include <vector>
 #include "dear_imgui/imgui.h"
-#include "dear_imgui/imgui_impl_glfw_gl3.h"
+#include "dear_imgui/imgui_impl_glfw.h"
+#include "dear_imgui/imgui_impl_opengl3.h"
 #include "irrKlang/irrKlang.h"
 #pragma comment(lib, "irrKlang.lib")
-
 
 extern void ball_init();
 extern void render_balls();
@@ -57,6 +57,8 @@ int		frame = 0;				// index of rendering frames
 bool	b_wireframe = false;	// this is the default
 float	cur_t = 0.0f;
 float	pre_t = 0.0f;
+bool	b_game_start = false;
+bool	b_game_pause = false;
 
 //*************************************
 // scene objects
@@ -83,8 +85,6 @@ void update()
 
 void render()
 {
-	// clear screen (with background color) and clear depth buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// notify GL that we use our own program and buffers
 	render_balls();
@@ -105,8 +105,6 @@ void render()
 	}
 	//render_particle();
 
-	// swap front and back buffers, and display to screen
-	glfwSwapBuffers(window);
 
 }
 
@@ -252,35 +250,75 @@ int main(int argc, char* argv[])
 	glfwSetMouseButtonCallback(window, mouse);	// callback for mouse click inputs
 	glfwSetCursorPosCallback(window, motion);		// callback for mouse movement
 
+	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGui_ImplGlfwGL3_Init(window, true);
-	ImGui::StyleColorsLight();
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330 core");
 
 	// enters rendering/event loop
 	for (frame = 0; !glfwWindowShouldClose(window); frame++)
 	{
 		glfwPollEvents();	// polling and processing of events
+		// clear screen (with background color) and clear depth buffer
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		ImGui_ImplGlfwGL3_NewFrame();
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("Game"))
+			{
 
-		static float f = 0.0f;
-		static int counter = 0;
+				if (ImGui::MenuItem("Start"))
+				{
+					if (b_game_start)
+					{
+						ball_init();
+						cube_init();
+						bricks_init();
+						brick_texture_init();
+					}
+					b_game_start = true;
+					b_game_pause = false;
+					frame = 0;
+				}
 
-		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+				char* pauseState;
 
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+				if (b_game_pause)
+					pauseState = "Resume";
+				else
+					pauseState = "Pause";
 
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+				if (ImGui::MenuItem(pauseState))
+				{
+					if (b_game_start)
+					{
+						b_game_pause = !b_game_pause;
+						if (!b_game_pause)
+							frame = 0;
+					}
+				}
+					
 
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
+				if (ImGui::MenuItem("Quit"))
+					return 0;
 
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::End();
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		
+		if (!b_game_start)
+		{
+			glfwSwapBuffers(window);
+			continue;
+		}
 
 		if (frame == 0)
 		{
@@ -288,35 +326,35 @@ int main(int argc, char* argv[])
 			continue;
 		}
 
-		cur_t = float(glfwGetTime());
-		float diff_t = cur_t - pre_t;
-
-		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		if (!b_game_pause)
 		{
-			float dx = diff_t * bar.speed;
-			bar.pos.x += dx;
-		}
-		else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		{
-			float dx = diff_t * bar.speed;
-			bar.pos.x -= dx;
-		}
-		ball.update(diff_t, bar, bricks);
-		bar.update(diff_t);
-		pre_t = cur_t;
-		ImGui::Render();
-		int display_w, display_h;
-		glfwGetFramebufferSize(window, &display_w, &display_h);
-		ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+			cur_t = float(glfwGetTime());
+			float diff_t = cur_t - pre_t;
 
-		update();			// per-frame update
+			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+			{
+				float dx = diff_t * bar.speed;
+				bar.pos.x += dx;
+			}
+			else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+			{
+				float dx = diff_t * bar.speed;
+				bar.pos.x -= dx;
+			}
+
+			ball.update(diff_t, bar, bricks);
+			bar.update(diff_t);
+			pre_t = cur_t;
+
+			update();			// per-frame update
+		}
+	
 		render();			// per-frame render
 
+		glfwSwapBuffers(window);
 
 	}
 
-	ImGui_ImplGlfwGL3_Shutdown();
-	ImGui::DestroyContext();
 	// normal termination
 	user_finalize();
 	cg_destroy_window(window);

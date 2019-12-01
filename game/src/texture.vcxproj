@@ -42,7 +42,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_UNICODE;UNICODE;_CRT_SECURE_NO_WARNINGS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>GL;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>GL;C:\Users\정문수\Desktop\git\CG\game\src\include;C:\Users\정문수\Desktop\git\CG\game\src\dear_imgui</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -59,7 +59,9 @@
     <ClCompile Include="dear_imgui\imgui.cpp" />
     <ClCompile Include="dear_imgui\imgui_demo.cpp" />
     <ClCompile Include="dear_imgui\imgui_draw.cpp" />
-    <ClCompile Include="dear_imgui\imgui_impl_glfw_gl3.cpp" />
+    <ClCompile Include="dear_imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="dear_imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="dear_imgui\imgui_widgets.cpp" />
     <ClCompile Include="GL\glad\glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="particle.cpp" />

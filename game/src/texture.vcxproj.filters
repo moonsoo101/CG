@@ -41,7 +41,13 @@
     <ClCompile Include="dear_imgui\imgui_draw.cpp">
       <Filter>Source Files\thirdparty</Filter>
     </ClCompile>
-    <ClCompile Include="dear_imgui\imgui_impl_glfw_gl3.cpp">
+    <ClCompile Include="dear_imgui\imgui_impl_glfw.cpp">
+      <Filter>Source Files\thirdparty</Filter>
+    </ClCompile>
+    <ClCompile Include="dear_imgui\imgui_impl_opengl3.cpp">
+      <Filter>Source Files\thirdparty</Filter>
+    </ClCompile>
+    <ClCompile Include="dear_imgui\imgui_widgets.cpp">
       <Filter>Source Files\thirdparty</Filter>
     </ClCompile>
   </ItemGroup>

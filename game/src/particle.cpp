@@ -47,12 +47,12 @@ void particle_init()
 	static vertex vertices[] = { {vec3(-1,-1,0),vec3(0,0,1),vec2(0,0)}, {vec3(1,-1,0),vec3(0,0,1),vec2(1,0)}, {vec3(-1,1,0),vec3(0,0,1),vec2(0,1)}, {vec3(1,1,0),vec3(0,0,1),vec2(1,1)} }; // strip ordering [0, 1, 3, 2]
 
 	// generation of vertex buffer: use vertices as it is
-	glGenBuffers(1, &vertex_buffer_particle);
+	glGenBuffers(2, &vertex_buffer_particle);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_particle);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * 4, &vertices[0], GL_STATIC_DRAW);
 
 	// create a particle texture
-	glGenTextures(1, &particle_tex);
+	glGenTextures(0, &particle_tex);
 	glBindTexture(GL_TEXTURE_2D, particle_tex);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pimage);
 
