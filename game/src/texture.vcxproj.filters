@@ -50,6 +50,9 @@
     <ClCompile Include="dear_imgui\imgui_widgets.cpp">
       <Filter>Source Files\thirdparty</Filter>
     </ClCompile>
+    <ClCompile Include="text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cgmath.h">
@@ -118,6 +121,12 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="..\bin\shaders\particle.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\bin\shaders\text.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\bin\shaders\text.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

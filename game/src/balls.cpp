@@ -98,6 +98,8 @@ void ball_init()
 
 	init_vertex_list();
 	init_index_list();
+	ball.center = vec3(0, -0.5f, 0);
+	ball.out = false;
 
 	glGenVertexArrays(1, &ballVAO);
 	glGenBuffers(1, &vertex_buffer_ball);

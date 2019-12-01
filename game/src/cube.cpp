@@ -155,6 +155,8 @@ void bricks_init()
 			bricks.push_back(tmp_brick);
 		}
 	}
+
+	bar.pos = vec3(0, -0.8f, 0);
 }
 
 void brick_texture_init()

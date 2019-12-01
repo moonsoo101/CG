@@ -14,6 +14,9 @@
 #include "irrKlang/irrKlang.h"
 #pragma comment(lib, "irrKlang.lib")
 
+void text_init();
+void render_text(std::string text, GLint x, GLint y, GLfloat scale, vec4 color);
+
 extern void ball_init();
 extern void render_balls();
 extern void cube_init();
@@ -59,6 +62,7 @@ float	cur_t = 0.0f;
 float	pre_t = 0.0f;
 bool	b_game_start = false;
 bool	b_game_pause = false;
+bool	b_die = false;
 
 //*************************************
 // scene objects
@@ -204,6 +208,7 @@ bool user_init()
 
 	cg_bind_vertex_attributes(program);
 
+	text_init();
 	cube_init();
 	bricks_init();
 	brick_texture_init();
@@ -263,6 +268,11 @@ int main(int argc, char* argv[])
 		// clear screen (with background color) and clear depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// render texts
+		render_text("Hello text!", 100, 100, 1.0f, vec4(0.5f, 0.8f, 0.2f, 1.0f));
+		render_text("I love Computer Graphics!", 100, 125, 0.5f, vec4(0.7f, 0.4f, 0.1f, 0.8f));
+		render_text("Blinking text here", 100, 155, 0.6f, vec4(0.5f, 0.7f, 0.7f, 0.0f));
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -282,6 +292,7 @@ int main(int argc, char* argv[])
 					}
 					b_game_start = true;
 					b_game_pause = false;
+					b_die = false;
 					frame = 0;
 				}
 
@@ -326,7 +337,10 @@ int main(int argc, char* argv[])
 			continue;
 		}
 
-		if (!b_game_pause)
+		if (ball.out)
+			b_die = true;
+
+		if (!b_game_pause && !b_die)
 		{
 			cur_t = float(glfwGetTime());
 			float diff_t = cur_t - pre_t;

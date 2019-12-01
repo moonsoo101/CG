@@ -65,6 +65,7 @@
     <ClCompile Include="GL\glad\glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="particle.cpp" />
+    <ClCompile Include="text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="balls.h" />
@@ -89,6 +90,8 @@
     <None Include="..\bin\shaders\bricks.vert" />
     <None Include="..\bin\shaders\particle.frag" />
     <None Include="..\bin\shaders\particle.vert" />
+    <None Include="..\bin\shaders\text.frag" />
+    <None Include="..\bin\shaders\text.vert" />
     <None Include="..\bin\shaders\texture.frag" />
     <None Include="..\bin\shaders\texture.vert" />
   </ItemGroup>

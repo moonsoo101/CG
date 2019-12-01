@@ -14,6 +14,7 @@ struct ball_t
 	vec3	vel = vec3(0.8f, 0.8f, 1.2f);
 	mat4	model_matrix;		// modeling transformation
 	bool	bColl = false;
+	bool	out = false;
 
 	// public functions
 	void	update(float t, bar_t& bar, std::vector<brick_t>& bricks);
@@ -113,7 +114,7 @@ inline void ball_t::update(float delta_t, bar_t& bar, std::vector<brick_t>& bric
 			vel.x *= -1;
 
 		if (isBallYOut())
-			vel.y *= -1;
+			out = true;
 
 		if (isBallZOut())
 			vel.z *= -1;
