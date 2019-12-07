@@ -8,6 +8,7 @@
 #include "material.h"
 #include "myrandom.h"
 #include "particle.h"
+#include <iostream>
 
 //*************************************
 // include stb_image with the implementation preprocessor definition
@@ -70,7 +71,7 @@ void particle_texture_init()
 
 	// create textures
 	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE2);
+	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &particle_texture);
 	glBindTexture(GL_TEXTURE_2D, particle_texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8 /* GL_RGB for legacy GL */, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pimage_particle);
@@ -87,6 +88,12 @@ void particle_texture_init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
+}
+
+void reset_particles()
+{
+	for (auto& p : particles)
+		p.reset();
 }
 
 bool render_particles(vec3& particle_pos)
@@ -109,28 +116,21 @@ bool render_particles(vec3& particle_pos)
 	uloc = glGetUniformLocation(program_particles, "up");					if (uloc > -1) glUniform3fv(uloc, 1, vec3(cam.view_matrix._21, cam.view_matrix._22, cam.view_matrix._23));
 	uloc = glGetUniformLocation(program_particles, "right");				if (uloc > -1) glUniform3fv(uloc, 1, vec3(cam.view_matrix._11, cam.view_matrix._12, cam.view_matrix._13));
 
-	for (auto& p : particles) p.update();
-
 	// setup texture
-	glActiveTexture(GL_TEXTURE2);								// select the texture slot to bind
+	glActiveTexture(GL_TEXTURE0);								// select the texture slot to bind
 	glBindTexture(GL_TEXTURE_2D, particle_texture);
-	glUniform1i(glGetUniformLocation(program_particles, "TEX"), 2);	 // GL_TEXTURE0
+	glUniform1i(glGetUniformLocation(program_particles, "TEX"), 0);	 // GL_TEXTURE0
 
 	for (auto& p : particles)
 	{
-		if (p.bDead)
-		{
-			particles.resize(max_particle);
-			p.bDead = false;
-			break;
-			return false;
-		}
-			
+		p.update();
 		uloc = glGetUniformLocation(program_particles, "color");				if (uloc > -1) glUniform4fv(uloc, 1, p.color);
 		uloc = glGetUniformLocation(program_particles, "model_matrix");			if (uloc > -1) glUniformMatrix4fv(uloc, 1, GL_TRUE, instancing_matrix * p.model_matrix);
 
 		// render quad vertices
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
+
+
 	return true;
 }

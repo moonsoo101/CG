@@ -24,7 +24,9 @@ extern ball_t ball;
 extern bar_t bar;
 extern light_t light;
 //*******************************************************************
+GLuint  cube_texture = 0;
 GLuint  brick_texture = 0;
+GLuint  metal_texture = 0;
 GLuint  program_bricks = 0;
 GLuint  program_bars = 0;
 GLuint	cubeVAO = 0;
@@ -35,8 +37,10 @@ static const char* frag_bars_path = "../bin/shaders/bars.frag";
 static const char* vert_bricks_path = "../bin/shaders/bricks.vert";
 static const char* frag_bricks_path = "../bin/shaders/bricks.frag";
 static const char* bricks_image_path = "../bin/images/bricks.jpg";
+static const char* metal_image_path = "../bin/images/metal.jpg";
 //*******************************************************************
 material_t bricks_material;
+material_t cube_material;
 //*******************************************************************
 
 int compare(const void* a, const void* b)   
@@ -141,8 +145,41 @@ void cube_init()
 	glBindVertexArray(0);
 }
 
+void cube_texture_init()
+{
+	// load and flip an image
+	int width, height, comp = 3;
+	unsigned char* pimage0 = stbi_load(bricks_image_path, &width, &height, &comp, 3); if (comp == 1) comp = 3; /* convert 1-channel to 3-channel image */
+	int stride0 = width * comp, stride1 = (stride0 + 3) & (~3);	// 4-byte aligned stride
+	unsigned char* pimage = (unsigned char*)malloc(sizeof(unsigned char) * stride1 * height);
+	for (int y = 0; y < height; y++) memcpy(pimage + (height - 1 - y) * stride1, pimage0 + y * stride0, stride0); // vertical flip
+
+	// create textures
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &cube_texture);
+	glBindTexture(GL_TEXTURE_2D, cube_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8 /* GL_RGB for legacy GL */, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pimage);
+
+	// allocate and create mipmap
+	int mip_levels = miplevels(window_size.x, window_size.y);
+	for (int k = 1, w = width >> 1, h = height >> 1; k < mip_levels; k++, w = max(1, w >> 1), h = max(1, h >> 1))
+		glTexImage2D(GL_TEXTURE_2D, k, GL_RGB8 /* GL_RGB for legacy GL */, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// configure texture parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	// release the new image
+	free(pimage);
+}
+
 void bricks_init()
 {
+	bricks.clear();
 	bricks_material.shininess = 10.0f;
 	constexpr int y_unit = 10;
 	int x_unit[y_unit] = { 0, };
@@ -150,6 +187,7 @@ void bricks_init()
 	std::vector<int> target_IDs;
 	for (int i = 0; i < RANDOM_BURST_NUM; i++)
 		target_IDs.push_back(int(random_range(0, 60)));
+
 	
 	for (int i = 0; i < sizeof(x_unit) / sizeof(int); i++)
 		x_unit[i] = int(random_range(6, 20));
@@ -220,6 +258,33 @@ void brick_texture_init()
 
 	// release the new image
 	free(pimage);
+
+	pimage0 = stbi_load(metal_image_path, &width, &height, &comp, 3); if (comp == 1) comp = 3; /* convert 1-channel to 3-channel image */
+	stride0 = width * comp, stride1 = (stride0 + 3) & (~3);	// 4-byte aligned stride
+	pimage = (unsigned char*)malloc(sizeof(unsigned char) * stride1 * height);
+	for (int y = 0; y < height; y++) memcpy(pimage + (height - 1 - y) * stride1, pimage0 + y * stride0, stride0); // vertical flip
+
+	// create textures
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE1);
+	glGenTextures(1, &metal_texture);
+	glBindTexture(GL_TEXTURE_2D, metal_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8 /* GL_RGB for legacy GL */, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pimage);
+
+	// allocate and create mipmap
+	mip_levels = miplevels(window_size.x, window_size.y);
+	for (int k = 1, w = width >> 1, h = height >> 1; k < mip_levels; k++, w = max(1, w >> 1), h = max(1, h >> 1))
+		glTexImage2D(GL_TEXTURE_2D, k, GL_RGB8 /* GL_RGB for legacy GL */, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// configure texture parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	// release the new image
+	free(pimage);
 }
 
 void render_bricks()
@@ -243,10 +308,6 @@ void render_bricks()
 	glUniform4fv(glGetUniformLocation(program_bricks, "Ks"), 1, bricks_material.specular);
 	glUniform1f(glGetUniformLocation(program_bricks, "shininess"), bricks_material.shininess);
 
-	glActiveTexture(GL_TEXTURE0);								
-	glBindTexture(GL_TEXTURE_2D, brick_texture);
-	glUniform1i(glGetUniformLocation(program_bricks, "TEX"), 0);	 
-
 	for (unsigned int i = 0; i < bricks.size(); i++)
 	{
 		if (!bricks[i].bShow)
@@ -257,11 +318,18 @@ void render_bricks()
 		float y_scale = bricks[i].y_scale;
 		mat4 model_matrix = mat4::translate(vec3(x_pos, y_pos, 0)) * mat4::scale(vec3(x_scale, y_scale, 8 * ball.radius));
 		glUniformMatrix4fv(glGetUniformLocation(program_bricks, "model_matrix"), 1, GL_TRUE, model_matrix);
-		glUniform1i(glGetUniformLocation(program_bricks, "b_burst"), false);
 		if (bricks[i].bBurst)
 		{
-			glUniform3fv(glGetUniformLocation(program_bricks, "color"), 1, bricks[i].burst_random_color);
-			glUniform1i(glGetUniformLocation(program_bricks, "b_burst"), bricks[i].bBurst);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, metal_texture);
+			glUniform1i(glGetUniformLocation(program_bricks, "TEX"), 1);
+
+		}
+		else
+		{
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, brick_texture);
+			glUniform1i(glGetUniformLocation(program_bricks, "TEX"), 0);
 		}
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
@@ -275,7 +343,23 @@ void render_bars()
 	GLint uloc;
 	uloc = glGetUniformLocation(program_bars, "view_matrix");		if (uloc > -1) glUniformMatrix4fv(uloc, 1, GL_TRUE, cam.view_matrix);
 	uloc = glGetUniformLocation(program_bars, "projection_matrix");	if (uloc > -1) glUniformMatrix4fv(uloc, 1, GL_TRUE, cam.projection_matrix);
+	// setup light properties
+	glUniform4fv(glGetUniformLocation(program_bricks, "light_position"), 1, light.position);
+	glUniform4fv(glGetUniformLocation(program_bricks, "Ia"), 1, light.ambient);
+	glUniform4fv(glGetUniformLocation(program_bricks, "Id"), 1, light.diffuse);
+	glUniform4fv(glGetUniformLocation(program_bricks, "Is"), 1, light.specular);
+
+	// setup material properties
+	glUniform4fv(glGetUniformLocation(program_bricks, "Ka"), 1, cube_material.ambient);
+	glUniform4fv(glGetUniformLocation(program_bricks, "Kd"), 1, cube_material.diffuse);
+	glUniform4fv(glGetUniformLocation(program_bricks, "Ks"), 1, cube_material.specular);
+	glUniform1f(glGetUniformLocation(program_bricks, "shininess"), cube_material.shininess);
 
 	glUniformMatrix4fv(glGetUniformLocation(program_bars, "model_matrix"), 1, GL_TRUE, bar.model_matrix);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, cube_texture);
+	glUniform1i(glGetUniformLocation(program_bricks, "TEX"), 0);
+
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }

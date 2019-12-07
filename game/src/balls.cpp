@@ -6,6 +6,11 @@
 
 #define LONGITUDE	72
 #define LATITUDE	36
+
+//*************************************
+// include stb_image with the implementation preprocessor definition
+#include "stb_image.h"
+
 //*******************************************************************
 extern struct camera cam;
 extern ivec2 window_size;
@@ -15,12 +20,14 @@ GLuint  program_balls = 0;
 GLuint	ballVAO = 0;
 GLuint	vertex_buffer_ball = 0;
 GLuint  index_buffer_ball = 0;
+GLuint  ball_texture = 0;
 //*******************************************************************
 std::vector<vertex>             vertex_list;
 std::vector<unsigned int>       index_list;
 //*******************************************************************
 static const char* vert_balls_path = "../bin/shaders/balls.vert";
 static const char* frag_balls_path = "../bin/shaders/balls.frag";
+static const char* ball_image_path = "../bin/images/ball.jpg";
 //*******************************************************************
 
 void init_vertex_list()
@@ -46,6 +53,7 @@ void init_vertex_list()
 	}
 	vertex_list.push_back({ vec3(0.0f,0.0f,-1.0f), vec3(0.0f, 0.0f, -1.0f), vec2(1.0f, 0.0f) });
 }
+
 void init_index_list()
 {
 	index_list.clear();
@@ -119,6 +127,39 @@ void ball_init()
 	glBindVertexArray(0);
 }
 
+void ball_texture_init()
+{
+	// load and flip an image
+	int width, height, comp = 3;
+	unsigned char* pimage0 = stbi_load(ball_image_path, &width, &height, &comp, 3);
+	int stride0 = width * comp, stride1 = (stride0 + 3) & (~3);	// 4-byte aligned stride
+	unsigned char* pimage = (unsigned char*)malloc(sizeof(unsigned char) * stride1 * height);
+	for (int y = 0; y < height; y++) memcpy(pimage + (height - 1 - y) * stride1, pimage0 + y * stride0, stride0); // vertical flip
+
+	// create textures
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &ball_texture);
+	glBindTexture(GL_TEXTURE_2D, ball_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8 /* GL_RGB for legacy GL */, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pimage);
+
+	// allocate and create mipmap
+	int mip_levels = miplevels(window_size.x, window_size.y);
+	for (int k = 1, w = width >> 1, h = height >> 1; k < mip_levels; k++, w = max(1, w >> 1), h = max(1, h >> 1))
+		glTexImage2D(GL_TEXTURE_2D, k, GL_RGB8 /* GL_RGB for legacy GL */, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// configure texture parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	// release the new image
+	free(pimage);
+}
+
+
 void render_balls()
 {
 	glUseProgram(program_balls);
@@ -128,6 +169,10 @@ void render_balls()
 	uloc = glGetUniformLocation(program_balls, "model_matrix");       if (uloc > -1) glUniformMatrix4fv(uloc, 1, GL_TRUE, ball.model_matrix);
 	uloc = glGetUniformLocation(program_balls, "view_matrix");		if (uloc > -1) glUniformMatrix4fv(uloc, 1, GL_TRUE, cam.view_matrix);
 	uloc = glGetUniformLocation(program_balls, "projection_matrix");	if (uloc > -1) glUniformMatrix4fv(uloc, 1, GL_TRUE, cam.projection_matrix);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, ball_texture);
+	glUniform1i(glGetUniformLocation(program_balls, "TEX"), 0);
 
 	glDrawElements(GL_TRIANGLES, index_list.size(), GL_UNSIGNED_INT, nullptr);
 

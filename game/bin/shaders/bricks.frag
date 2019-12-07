@@ -18,7 +18,6 @@ uniform sampler2D TEX;
 uniform bool b_shading;
 uniform bool b_texcoord;
 
-uniform bool b_burst;
 uniform vec3 color;
 
 vec4 phong( vec3 l, vec3 n, vec3 h, vec4 Kd )
@@ -43,6 +42,4 @@ void main()
 	vec4 Kd = texture2D( TEX, tc );
 	fragColor = phong( l, n, h, Kd );
 	
-	if(b_burst)
-		fragColor = fragColor * vec4(color, 1.0f);
 }

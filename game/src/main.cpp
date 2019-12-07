@@ -18,14 +18,17 @@ void text_init();
 void render_text(std::string text, GLint x, GLint y, GLfloat scale, vec4 color);
 
 extern void ball_init();
+extern void ball_texture_init();
 extern void render_balls();
 extern void cube_init();
 extern void bricks_init();
 extern void render_bricks();
+extern void cube_texture_init();
 extern void brick_texture_init();
 extern void render_bars();
 extern void particle_init();
 extern bool render_particles(vec3& particle_pos);
+extern void reset_particles();
 extern void particle_texture_init();
 //*************************************
 // global constants
@@ -91,9 +94,6 @@ void update()
 
 void render()
 {
-
-	render_balls();
-
 	glUseProgram(program);
 	glBindVertexArray(floorVAO);
 	mat4 model_matrix = mat4::translate(vec3(0, -1, 0)) * mat4::scale(vec3(2.0f, 2.0f, 2.0f));
@@ -102,13 +102,9 @@ void render()
 
 	render_bricks();
 	render_bars();
-	if (cur_frame_burst)
-	{
-		printf("Burst");
-		if(!render_particles(burst_pos))
-			cur_frame_burst = false;
-	}
-	
+	render_particles(burst_pos);
+	render_balls();
+
 	if (ball.bColl)
 	{
 		engine->play2D(effect);
@@ -191,8 +187,6 @@ bool user_init()
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	ball_init();
 
 	// create corners and vertices
 	vertex corners[4];
@@ -214,8 +208,11 @@ bool user_init()
 	cg_bind_vertex_attributes(program);
 
 	cube_init();
+	cube_texture_init();
 	bricks_init();
 	brick_texture_init();
+	ball_init();
+	ball_texture_init();
 	particle_init();
 	particle_texture_init();
 	text_init();
@@ -364,9 +361,9 @@ int main(int argc, char* argv[])
 			{
 				if (bricks[i].bShow == false && bricks[i].bBurst == true)
 				{
-					cur_frame_burst = true;
 					burst_pos = vec3(bricks[i].pos, 0);
 					bricks[i].bBurst = false;
+					reset_particles();
 				}
 			}
 			bar.update(diff_t);
