@@ -8,7 +8,7 @@
 
 struct bar_t
 {
-	vec3    size_scale = vec3(2 *1.0f / 8, 0.02f, 0.02f);		// radius
+	vec3    size_scale = vec3(1.0f / 8, 0.02f, 0.02f);		// radius
 	vec3	pos = vec3(0, -0.8f, 0);		// 2D position for translation
 	vec4	color = vec4(0, 0, 1.0f, 1.0f);				// RGBA color in [0,1]
 	float	speed = 1.0f;
